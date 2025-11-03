@@ -2,199 +2,323 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Repository Overview
 
-This is a **static HTML presentation website** about Cursor and AI-assisted coding. The presentation consists of 10 interconnected slides with keyboard navigation and a shared navigation bar. All content is in French.
+This repository contains **two distinct projects**:
 
-**Key Characteristic**: This is a pure static site with no build process, no package manager, and no compilation step. Files are deployed directly to GitHub Pages.
+1. **French AI Presentation Website** (HTML/CSS/JS) - Static site about Cursor and AI coding tools
+2. **Spring Boot Task Management API** (Java/Spring) - Production-ready REST API with TDD approach
 
-## Project Architecture
+## Build & Test Commands
 
-### Multi-Page Static Navigation System
-
-The site uses a **coordinated multi-file approach** where:
-
-1. **Each slide is a standalone HTML file** (`docs/*.html`)
-2. **Shared navigation state** is managed by `docs/js/script.js`
-3. **A slides manifest** is hardcoded in `script.js:2-13` defining the slide order
-
-**Critical Architecture Detail**: The slides array in `script.js` MUST stay synchronized with:
-- The actual HTML files in `docs/`
-- The navigation links in each HTML file's `<nav>` section
-- The slide counter display logic
-
-Example slides array structure:
-```javascript
-const slides = [
-    { id: 'title', title: 'L\'Intelligence Artificielle...', file: 'index.html' },
-    { id: 'contexte', title: 'Du Complètion de Code...', file: 'contexte.html' },
-    // ... 8 more entries
-];
-```
-
-### Slide Navigation Flow
-
-1. User lands on any `.html` file
-2. `script.js` executes on `DOMContentLoaded`
-3. `getCurrentSlideIndex()` parses `window.location.pathname` to find current position
-4. Updates active nav link styling and slide counter
-5. Keyboard events (ArrowLeft/ArrowRight) trigger `prevSlide()`/`nextSlide()`
-6. Navigation executes via `window.location.href` (full page reload)
-
-**Why this matters**: When adding/removing slides, you must update:
-- Create/delete the HTML file in `docs/`
-- Update the `slides` array in `script.js`
-- Update all `<nav>` sections across all HTML files (if adding to nav bar)
-
-### Styling Architecture
-
-**Single CSS file** (`docs/css/style.css`) defines:
-- CSS custom properties for theming (colors, spacing)
-- Shared layout components (nav, footer, slide-wrapper)
-- Typography system (Inter for body, Poppins for headings)
-- Responsive breakpoints
-
-**Important**: Each HTML file contains **inline styles** for slide-specific layouts. This is intentional for per-slide customization without creating component classes.
-
-## Development Workflow
-
-### Running Locally
-
-**No build step required**. Open HTML files directly:
+### Spring Boot API
 
 ```bash
-# Option 1: Direct file opening
-open docs/index.html
+# Build project
+mvn clean install
 
-# Option 2: Simple HTTP server (recommended for accurate path testing)
-cd docs
-python3 -m http.server 8000
-# Visit http://localhost:8000
+# Run tests only
+mvn test
+
+# Run specific test class
+mvn test -Dtest=TaskServiceTest
+
+# Generate code coverage report (enforces 85% minimum)
+mvn clean verify
+# View report: target/site/jacoco/index.html
+
+# Run application
+mvn spring-boot:run
+# Access Swagger UI: http://localhost:8080/swagger-ui.html
+# Access H2 Console: http://localhost:8080/h2-console (JDBC URL: jdbc:h2:mem:taskdb, user: sa)
+
+# Run with different port
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
+
+# Compile only (faster than full build)
+mvn compile
+
+# Force dependency re-download
+mvn clean install -U
 ```
 
-**Why a server matters**: Local file protocol (`file://`) doesn't handle relative paths identically to HTTP servers. Use HTTP server to test navigation.
+### Presentation Website
 
-### Making Content Changes
+No build process - static HTML files. Open `index.html` directly in browser or use any HTTP server.
 
-**Editing slide content**:
-1. Open the specific `docs/*.html` file
-2. Edit content inside `<main>` section
-3. Refresh browser (no compilation needed)
+## Architecture: Spring Boot Task Management API
 
-**Adding a new slide**:
-1. Duplicate an existing HTML file (e.g., `cp docs/cursor.html docs/newslide.html`)
-2. Update the content in `newslide.html`
-3. Add entry to `slides` array in `docs/js/script.js`
-4. Update `<nav>` sections in ALL HTML files to include link to new slide
-5. Test keyboard navigation flows correctly
+### TDD-First Development Pattern
 
-**Modifying styles**:
-- Global changes: Edit `docs/css/style.css`
-- Slide-specific layouts: Edit inline styles in individual HTML files
+This codebase follows **strict Test-Driven Development**:
+1. **Tests written FIRST** - See `src/test/java/com/taskmanagement/service/TaskServiceTest.java`
+2. **Implementation follows** - See `src/main/java/com/taskmanagement/service/TaskService.java`
+3. **Coverage enforced** - JaCoCo fails build if < 85%
 
-### Deployment
+When adding features: Write test → Run (should fail) → Implement → Run (should pass) → Refactor
 
-**GitHub Pages** is the deployment target. Configuration:
-- Source: `main` branch, `/root` directory (NOT `/docs`)
-- The `/docs` folder is recognized automatically by GitHub Pages
+### Layered Architecture Flow
 
-**Deployment command**:
+```
+HTTP Request
+    ↓
+Controller (REST endpoints + Swagger docs)
+  → @RestController, @RequestMapping
+  → Validates input with @Valid
+  → Returns DTOs (TaskResponse, AuthResponse)
+    ↓
+Service (Business logic + @Transactional)
+  → Single responsibility per service
+  → Throws ResourceNotFoundException on errors
+  → Converts Entity ↔ DTO
+    ↓
+Repository (Data access via Spring Data JPA)
+  → Extends JpaRepository<Entity, ID>
+  → Custom query methods (findByAssignedUser, etc.)
+    ↓
+Database (H2 in-memory, easily swappable)
+```
+
+### Security Architecture
+
+**JWT Token Flow:**
+1. User registers/logs in via `/api/auth/register` or `/api/auth/login`
+2. `AuthService` validates credentials using `AuthenticationManager`
+3. `JwtTokenProvider` generates signed JWT token
+4. Client includes token in `Authorization: Bearer <token>` header
+5. `JwtAuthenticationFilter` intercepts requests, validates token
+6. `CustomUserDetailsService` loads user details
+7. Spring Security `SecurityContext` is populated
+8. Controller methods access authenticated user via `Authentication` parameter
+
+**Security Configuration:**
+- Public endpoints: `/api/auth/**`, `/swagger-ui/**`, `/v3/api-docs/**`, `/h2-console/**`
+- All other endpoints require valid JWT
+- Stateless sessions (no server-side session storage)
+- BCrypt password encoding
+
+### Entity Relationships
+
+```
+User (1) ←→ (N) Task
+  ↓               ↓
+- id            - id
+- username      - title
+- email         - description
+- password      - status (enum: TODO, IN_PROGRESS, COMPLETED, CANCELLED)
+- roles         - priority (enum: LOW, MEDIUM, HIGH, URGENT)
+                - dueDate
+                - assignedUser (ManyToOne)
+                - createdAt, updatedAt (auto-managed)
+```
+
+### DTO Pattern Usage
+
+**Never expose entities directly in API responses:**
+- `TaskRequest` (input) → `Task` entity → `TaskResponse` (output)
+- Use `TaskResponse.fromEntity(task)` for conversion
+- DTOs include Swagger `@Schema` annotations for documentation
+
+### Exception Handling Strategy
+
+**Centralized via `GlobalExceptionHandler`:**
+- `ResourceNotFoundException` → 404 with custom error message
+- `MethodArgumentNotValidException` → 400 with field-level validation errors
+- `BadCredentialsException` → 401 for authentication failures
+- Generic `Exception` → 500 with sanitized message
+
+All error responses follow consistent format:
+```json
+{
+  "status": 404,
+  "message": "Task not found with ID: 999",
+  "timestamp": "2024-01-15T14:30:00"
+}
+```
+
+## Key Configuration Files
+
+### application.properties
+- `jwt.secret`: Must be long enough for HS256 (64+ chars)
+- `jwt.expiration`: Token lifetime in milliseconds (default: 24 hours)
+- `spring.jpa.hibernate.ddl-auto`: Set to `create-drop` for H2, change for production DB
+
+### pom.xml
+- JaCoCo enforces 85% instruction + branch coverage
+- Uses Spring Boot 3.2.0 (Jakarta EE 9+, not javax)
+- Lombok requires annotation processing enabled in IDE
+
+## Swagger/OpenAPI Documentation
+
+**Every endpoint must include:**
+- `@Operation` with summary and description
+- `@ApiResponses` for ALL status codes (200, 201, 400, 401, 404, 500)
+- `@Parameter` descriptions with examples
+- Request/response body examples using `@ExampleObject`
+- `@SecurityRequirement(name = "bearerAuth")` for protected endpoints
+
+**Configuration:** See `OpenApiConfig.java` for global API metadata
+
+## Testing Strategy
+
+### Service Layer Tests (Unit)
+- Located in `src/test/java/com/taskmanagement/service/`
+- Mock repositories using `@Mock` and Mockito
+- Use `@ExtendWith(MockitoExtension.class)`
+- Test both happy paths and error scenarios
+- Verify repository method calls with `ArgumentCaptor`
+
+### Test Organization
+```java
+@BeforeEach   // Setup test data
+@Test         // Individual test cases
+@DisplayName  // Descriptive test names
+```
+
+**Coverage Requirements:**
+- Every public method in Service classes must have tests
+- Both success and failure scenarios
+- Edge cases (null values, empty lists, invalid IDs)
+
+## Lombok Usage
+
+**All entities and DTOs use Lombok:**
+- `@Data`: Generates getters, setters, toString, equals, hashCode
+- `@NoArgsConstructor`: JPA requires no-arg constructor
+- `@AllArgsConstructor`: Convenience constructor
+- `@RequiredArgsConstructor`: For services with final fields
+- `@Slf4j`: Logger injection
+
+**IDE Setup Required:** Enable annotation processing in IDE settings (IntelliJ, Eclipse, VS Code)
+
+## Common Development Patterns
+
+### Adding New Entity/Resource
+
+1. Create entity class in `entity/` with JPA annotations
+2. Create repository interface extending `JpaRepository`
+3. Create DTOs: Request (input) and Response (output)
+4. **Write service tests first** in `test/service/`
+5. Implement service class with business logic
+6. Create controller with Swagger documentation
+7. Run `mvn test` to verify tests pass
+8. Run `mvn verify` to ensure 85%+ coverage
+
+### Adding New Endpoint
+
+1. Add method to Controller with full Swagger annotations
+2. Ensure `@ApiResponses` covers all status codes
+3. Use `@Valid` for request body validation
+4. Return appropriate `ResponseEntity<T>` with HTTP status
+5. Handle authentication via `Authentication` parameter
+6. Test via Swagger UI at `/swagger-ui.html`
+
+### Modifying Security Rules
+
+Edit `SecurityConfig.java`:
+- Add public endpoints to `.requestMatchers("/path/**").permitAll()`
+- Protected endpoints automatically require JWT
+- Never disable CSRF for non-stateless authentication
+
+## Database Migrations
+
+**Current Setup:** H2 in-memory with `ddl-auto=create-drop` (dev only)
+
+**For Production:**
+1. Switch to PostgreSQL/MySQL in `application.properties`
+2. Change `ddl-auto` to `validate`
+3. Add Flyway/Liquibase for schema migrations
+4. Remove H2 dependency from `pom.xml`
+
+## Important Notes
+
+- **Jakarta vs javax:** Spring Boot 3.x uses `jakarta.persistence.*`, not `javax.persistence.*`
+- **Java Records:** Used in `GlobalExceptionHandler` for error responses (requires Java 14+)
+- **JWT Secret:** Default secret in properties is for development only - use environment variable in production
+- **Lazy Loading:** Task entity uses `@ManyToOne(fetch = FetchType.LAZY)` - ensure user is loaded before conversion to DTO
+- **Test Profile:** Tests use separate `application-test.properties` with different configuration
+
+## Project Directories
+
+- `prompts/` - Contains `init.md` with original TDD requirements
+- `claudedocs/` - Claude-generated documentation and implementation summaries
+- `src/main/java/com/taskmanagement/` - Main application code
+- `src/test/java/com/taskmanagement/` - Test code
+- `target/` - Build output (ignored by git)
+- `docs/` - French presentation website (separate from Spring Boot API)
+
+## ⚠️ CRITICAL: TDD & Coverage Requirements
+
+### 🔴 NON-NEGOTIABLE RULES
+
+1. **Tests MUST be written FIRST** - No implementation code without tests
+2. **85% minimum coverage** - JaCoCo enforces this in `mvn verify`
+3. **Build fails if coverage < 85%** - This is intentional and enforced
+4. **Every public method needs tests** - No exceptions
+
+### TDD Workflow - ALWAYS FOLLOW
+
+```
+1. Write Test (Red)    → Test MUST fail initially
+2. Implement Code      → Make test pass
+3. Run Tests (Green)   → Verify test passes
+4. Refactor           → Improve code quality
+5. Run mvn verify     → Ensure 85%+ coverage
+```
+
+### Coverage Checklist
+
+Before marking any task complete, verify:
+- [ ] All new public methods have tests
+- [ ] Both success and failure scenarios are tested
+- [ ] Edge cases are covered (null, empty, invalid input)
+- [ ] `mvn test` passes (all tests green)
+- [ ] `mvn verify` passes (coverage ≥85%)
+- [ ] Coverage report reviewed: `target/site/jacoco/index.html`
+
+### Current Missing Tests (MUST BE ADDED)
+
+**HIGH PRIORITY:**
+- `AuthService` - user registration, login, password encoding
+- `AuthController` - register/login endpoints, validation errors
+- `TaskController` - all CRUD endpoints with auth checks
+
+**MEDIUM PRIORITY:**
+- `JwtTokenProvider` - token generation, validation, expiration
+- `JwtAuthenticationFilter` - token extraction, validation flow
+- `CustomUserDetailsService` - user loading, error handling
+
+### Quick Commands
+
 ```bash
-git add .
-git commit -m "Update: [description]"
-git push origin main
-# GitHub Pages auto-deploys in ~2-5 minutes
+# Run tests only
+mvn test
+
+# Check coverage (enforces 85%)
+mvn verify
+
+# View coverage report
+open target/site/jacoco/index.html
+
+# Test specific class
+mvn test -Dtest=AuthServiceTest
+
+# Run with debug
+mvn test -X
 ```
 
-**Deployment URL pattern**: `https://[username].github.io/cursor-ai-presentation/`
+## Troubleshooting
 
-### Common Issues
+**JDK 25 + Lombok incompatibility:** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - MUST use JDK 21 or 17
 
-**Navigation not updating after adding slide**:
-- Verify `slides` array in `script.js` includes new entry
-- Check `file` property matches actual filename
-- Ensure new HTML file is in `docs/` directory
+**Compilation errors with getters/setters:** Enable Lombok annotation processing in IDE
 
-**Styles not applying**:
-- Check CSS file path is `css/style.css` (relative from HTML location)
-- Clear browser cache (Cmd+Shift+R / Ctrl+Shift+R)
-- Verify CSS custom properties are defined in `:root` selector
+**Tests fail:** Ensure mocks are properly configured and test data matches expectations
 
-**Images not loading on GitHub Pages**:
-- Paths must be relative: `images/filename.png` (NOT `/images/...`)
-- Verify images are committed to git and pushed
-- Check file extensions match exactly (case-sensitive on Linux servers)
+**Coverage below 85%:** Build will fail - add tests for uncovered methods (THIS IS EXPECTED BEHAVIOR)
 
-## Important File Locations
+**Port 8080 in use:** Change port with `-Dspring-boot.run.arguments=--server.port=8081`
 
-**Never modify**:
-- `.git/` - Git repository metadata
-- `.gitignore` - Already properly configured
+**JWT validation fails:** Check token expiration, ensure secret matches between generation and validation
 
-**Core files**:
-- `docs/js/script.js` - Navigation logic and slides manifest
-- `docs/css/style.css` - Global styles and design system
-- `docs/*.html` - Individual slide pages
-
-**Documentation**:
-- `README.md` - User-facing documentation
-- `DEPLOYMENT_GUIDE.md` - GitHub Pages deployment instructions
-- `claudedocs/` - Claude Code analysis reports
-
-## Design System
-
-**Color palette** (defined as CSS variables):
-- `--color-purple`: Primary gradient start
-- `--color-blue`: Primary gradient end
-- `--color-charcoal`: Text color
-- `--color-white`: Background
-- `--color-light-purple/blue`: Accent backgrounds
-
-**Typography scale**:
-- Headings: Poppins, weights 600-800
-- Body: Inter, weights 400-700
-- Gradient text effect applied to `.gradient-text` class
-
-**Layout patterns**:
-- `.slide-wrapper` → `.slide-container` → content sections
-- `.title-section` / `.image-section` for two-column layouts
-- `.content-box` for card-style content blocks
-
-## Testing Before Commits
-
-**Manual verification checklist**:
-1. ✅ All HTML files load without 404 errors
-2. ✅ Navigation links work in both directions
-3. ✅ Keyboard navigation (←/→) works on all slides
-4. ✅ Slide counter displays correct numbers
-5. ✅ Images load correctly
-6. ✅ No console errors in browser DevTools
-
-**Navigation integrity test**:
-```bash
-# Verify slides array matches actual files
-cd docs
-ls -1 *.html | wc -l  # Should match slides.length in script.js
-```
-
-## Git Workflow
-
-**Current branch**: `main`
-**Remote**: `origin` → `https://github.com/Sboussekeyt/cursor-ai-presentation.git`
-
-**Standard workflow**:
-```bash
-git status                    # Check what's changed
-git add docs/                 # Stage presentation files
-git commit -m "Update: [description]"
-git push origin main          # Deploy to GitHub Pages
-```
-
-**When adding new files**: Ensure they're not in `.gitignore` and are inside committed directories.
-
-## Content Language
-
-All content is in **French**. When generating or editing content:
-- Use French for slide titles, descriptions, and UI labels
-- Maintain formal/professional tone ("vous" not "tu")
-- Technical terms (like "Cursor", "AI", "LLM") remain in English
+**For detailed troubleshooting:** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
