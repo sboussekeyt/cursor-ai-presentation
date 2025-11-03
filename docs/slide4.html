@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Engineering - Tokens & Fenêtre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/slides.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 80%"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">Cursor & IA</div>
+            <div class="slide-counter">Slide 4 / 5</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="slide1.html">Cursor</a></li>
+                <li><a href="slide2.html">Modèles</a></li>
+                <li><a href="slide3.html">Context 1</a></li>
+                <li><a href="slide4.html" class="active">Context 2</a></li>
+                <li><a href="slide5.html">Context 3</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="slide-wrapper">
+            <div class="slide-container">
+                <!-- Header -->
+                <div class="slide-header">
+                    <div class="gradient-line"></div>
+                    <h1 class="gradient-text">Context Engineering (2/3)</h1>
+                    <p class="subtitle">Comprendre les Tokens : Optimiser la Fenêtre de Contexte</p>
+                </div>
+
+                <!-- What is a Token -->
+                <div class="card">
+                    <h2>🔤 Qu'est-ce qu'un Token ?</h2>
+                    <p style="margin-bottom: 20px;">Unité de traitement du texte par le LLM (~4 caractères en anglais, ~2-3 en français)</p>
+                    <div class="content-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div style="background: var(--color-light-purple); padding: 20px; border-radius: 8px; text-align: center;">
+                            <code style="font-size: 18px; color: var(--color-purple-dark);">"Hello"</code>
+                            <div style="margin-top: 12px; font-size: 24px; font-weight: 700; color: var(--color-purple);">1 token</div>
+                        </div>
+                        <div style="background: var(--color-light-blue); padding: 20px; border-radius: 8px; text-align: center;">
+                            <code style="font-size: 18px; color: var(--color-purple-dark);">"Bonjour"</code>
+                            <div style="margin-top: 12px; font-size: 24px; font-weight: 700; color: var(--color-blue);">2 tokens</div>
+                            <small style="color: var(--color-gray);">(Bon + jour)</small>
+                        </div>
+                        <div style="background: #D1FAE5; padding: 20px; border-radius: 8px; text-align: center;">
+                            <code style="font-size: 18px; color: var(--color-purple-dark);">"const x = 10;"</code>
+                            <div style="margin-top: 12px; font-size: 24px; font-weight: 700; color: #10B981;">5 tokens</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context Window -->
+                <div class="card">
+                    <h2>🪟 La Fenêtre de Contexte (Context Window)</h2>
+                    <p style="margin-bottom: 20px;">Quantité maximale de tokens que le modèle peut traiter simultanément</p>
+                    <div class="token-viz">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <strong style="font-size: 18px; color: var(--color-purple-dark);">Exemple : 200k tokens</strong>
+                        </div>
+                        <div class="token-bar">
+                            <div class="token-segment token-system" style="width: 5%;">
+                                <span>System<br>5k</span>
+                            </div>
+                            <div class="token-segment token-files" style="width: 30%;">
+                                <span>Files<br>50k</span>
+                            </div>
+                            <div class="token-segment token-chat" style="width: 50%;">
+                                <span>Chat History<br>100k</span>
+                            </div>
+                            <div class="token-segment token-output" style="width: 15%;">
+                                <span>Output<br>45k</span>
+                            </div>
+                        </div>
+                        <div class="token-legend">
+                            <div class="token-legend-item">
+                                <div class="token-color token-system"></div>
+                                <span><strong>System Prompt</strong> : Instructions de base</span>
+                            </div>
+                            <div class="token-legend-item">
+                                <div class="token-color token-files"></div>
+                                <span><strong>Files</strong> : Code et docs inclus (@)</span>
+                            </div>
+                            <div class="token-legend-item">
+                                <div class="token-color token-chat"></div>
+                                <span><strong>Chat History</strong> : Conversation</span>
+                            </div>
+                            <div class="token-legend-item">
+                                <div class="token-color token-output"></div>
+                                <span><strong>Output Buffer</strong> : Réponse générée</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem: Context Overflow -->
+                <div class="card">
+                    <h2>⚠️ Problème : Dépassement de Contexte</h2>
+                    <div class="features-grid">
+                        <div class="feature-item" style="background: #FEE2E2;">
+                            <span class="feature-icon">❌</span>
+                            <div>
+                                <strong>Erreur Commune</strong>
+                                <p><code>"Context length exceeded"</code> - Le contexte dépasse la limite</p>
+                            </div>
+                        </div>
+                        <div class="feature-item" style="background: #FFEDD5;">
+                            <span class="feature-icon">🧠</span>
+                            <div>
+                                <strong>Perte de Mémoire</strong>
+                                <p>Le LLM "oublie" le début de la conversation</p>
+                            </div>
+                        </div>
+                        <div class="feature-item" style="background: #FEF3C7;">
+                            <span class="feature-icon">💸</span>
+                            <div>
+                                <strong>Coût Croissant</strong>
+                                <p>Plus de tokens = facture plus élevée</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compression Strategies -->
+                <div class="card">
+                    <h2>🗜️ Stratégies de Compression</h2>
+                    <div class="content-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="feature-item">
+                            <span class="feature-icon">✂️</span>
+                            <div>
+                                <strong>Résumé</strong>
+                                <p>Condenser l'historique en résumés concis des conversations précédentes</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎯</span>
+                            <div>
+                                <strong>Sélection</strong>
+                                <p>N'inclure que les fichiers strictement pertinents pour la tâche actuelle</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🗜️</span>
+                            <div>
+                                <strong>Compression</strong>
+                                <p>Reformuler le contexte de manière plus concise sans perte d'information</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🔄</span>
+                            <div>
+                                <strong>Rotation</strong>
+                                <p>Archiver les conversations anciennes, garder seulement le contexte récent</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Token Budget Chart -->
+                <div class="card">
+                    <h2>📊 Distribution Optimale des Tokens</h2>
+                    <div style="background: var(--color-light-blue); padding: 32px; border-radius: 8px; text-align: center;">
+                        <div style="max-width: 600px; margin: 0 auto;">
+                            <svg viewBox="0 0 200 200" style="width: 100%; height: auto;">
+                                <!-- Pie chart segments -->
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="#8B5CF6" stroke-width="60"
+                                    stroke-dasharray="25.13 314.16" transform="rotate(-90 100 100)"/>
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="#3B82F6" stroke-width="60"
+                                    stroke-dasharray="94.25 314.16" stroke-dashoffset="-25.13" transform="rotate(-90 100 100)"/>
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="#10B981" stroke-width="60"
+                                    stroke-dasharray="157.08 314.16" stroke-dashoffset="-119.38" transform="rotate(-90 100 100)"/>
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="#F59E0B" stroke-width="60"
+                                    stroke-dasharray="47.12 314.16" stroke-dashoffset="-276.46" transform="rotate(-90 100 100)"/>
+                                <text x="100" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#1F2937">Token Budget</text>
+                            </svg>
+                            <div class="token-legend" style="margin-top: 24px;">
+                                <div class="token-legend-item">
+                                    <div class="token-color" style="background: #8B5CF6;"></div>
+                                    <span><strong>5%</strong> System Prompt</span>
+                                </div>
+                                <div class="token-legend-item">
+                                    <div class="token-color" style="background: #3B82F6;"></div>
+                                    <span><strong>30%</strong> Files & Docs</span>
+                                </div>
+                                <div class="token-legend-item">
+                                    <div class="token-color" style="background: #10B981;"></div>
+                                    <span><strong>50%</strong> Chat History</span>
+                                </div>
+                                <div class="token-legend-item">
+                                    <div class="token-color" style="background: #F59E0B;"></div>
+                                    <span><strong>15%</strong> Output Buffer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="slide-navigation">
+                    <a href="slide3.html" class="nav-button secondary">← Mémoire & Stockage</a>
+                    <a href="slide5.html" class="nav-button primary">MCP & Sources →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Présentation Cursor et l'IA pour le Codage</p>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+</body>
+</html>

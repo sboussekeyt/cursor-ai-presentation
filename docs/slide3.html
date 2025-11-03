@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Engineering - Mémoire & Stockage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/slides.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 60%"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">Cursor & IA</div>
+            <div class="slide-counter">Slide 3 / 5</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="slide1.html">Cursor</a></li>
+                <li><a href="slide2.html">Modèles</a></li>
+                <li><a href="slide3.html" class="active">Context 1</a></li>
+                <li><a href="slide4.html">Context 2</a></li>
+                <li><a href="slide5.html">Context 3</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="slide-wrapper">
+            <div class="slide-container">
+                <!-- Header -->
+                <div class="slide-header">
+                    <div class="gradient-line"></div>
+                    <h1 class="gradient-text">Context Engineering (1/3)</h1>
+                    <p class="subtitle">Gérer l'Absence de Mémoire : Stratégies de Persistence</p>
+                </div>
+
+                <!-- Problem Statement -->
+                <div class="card">
+                    <h2>⚠️ Le Problème : Pas de Mémoire Persistante</h2>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <span class="feature-icon">🔄</span>
+                            <div>
+                                <strong>Stateless</strong>
+                                <p>Les LLMs n'ont pas d'état persistant entre les sessions</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🆕</span>
+                            <div>
+                                <strong>Nouveau Contexte</strong>
+                                <p>Chaque conversation démarre avec un contexte vierge</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💥</span>
+                            <div>
+                                <strong>Perte d'Informations</strong>
+                                <p>Les connaissances du projet disparaissent entre sessions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution 1: Markdown Files -->
+                <div class="card">
+                    <h2>📝 Solution 1 : Fichiers Markdown (.md)</h2>
+                    <p style="margin-bottom: 20px;">Stocker le contexte dans des fichiers versionnés avec le code</p>
+                    <div class="code-block">
+<pre>project/
+├── .cursorrules          # Règles globales du projet
+├── CLAUDE.md             # Instructions pour Claude
+├── docs/
+│   ├── architecture.md   # Contexte architectural
+│   └── conventions.md    # Standards de code
+└── src/
+    └── ...</pre>
+                    </div>
+                    <ul class="feature-list" style="margin-top: 20px;">
+                        <li><strong>.cursorrules</strong> : Règles automatiquement chargées par Cursor</li>
+                        <li><strong>CLAUDE.md</strong> : Instructions spécifiques au projet</li>
+                        <li><strong>docs/</strong> : Documentation technique et architectural</li>
+                    </ul>
+                </div>
+
+                <!-- Solution 2: Context Files -->
+                <div class="card">
+                    <h2>📎 Solution 2 : Context Files</h2>
+                    <p style="margin-bottom: 20px;">Référencer dynamiquement des fichiers dans le contexte</p>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <span class="feature-icon">📄</span>
+                            <div>
+                                <strong>@filename</strong>
+                                <p>Inclure un fichier spécifique : <code>@components/Button.tsx</code></p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📁</span>
+                            <div>
+                                <strong>@folder</strong>
+                                <p>Inclure tout un répertoire : <code>@src/utils/</code></p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🌐</span>
+                            <div>
+                                <strong>@web</strong>
+                                <p>Récupérer docs externes : <code>@https://react.dev/docs</code></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution 3: MCP -->
+                <div class="card">
+                    <h2>🔌 Solution 3 : MCP (Model Context Protocol)</h2>
+                    <p style="margin-bottom: 20px;">Connecter des serveurs de contexte externes</p>
+                    <div class="content-grid" style="grid-template-columns: repeat(2, 1fr);">
+                        <div>
+                            <ul class="feature-list">
+                                <li><strong>Serveurs externes</strong> pour enrichir le contexte</li>
+                                <li><strong>Bases de connaissances</strong> spécialisées</li>
+                                <li><strong>Context7</strong> pour docs officielles</li>
+                                <li><strong>APIs tierces</strong> pour données en temps réel</li>
+                            </ul>
+                        </div>
+                        <div style="background: var(--color-light-blue); border-radius: 8px; padding: 20px; display: flex; align-items: center; justify-content: center;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 12px;">🔌</div>
+                                <strong style="color: var(--color-purple-dark);">MCP Servers</strong>
+                                <p style="font-size: 13px; margin-top: 8px;">Contexte enrichi<br>en temps réel</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Architecture Diagram -->
+                <div class="card">
+                    <h2>🏗️ Architecture de Context Loading</h2>
+                    <div class="diagram">
+                        <div class="diagram-box">Requête Utilisateur</div>
+                        <div class="diagram-arrow">↓</div>
+                        <div class="diagram-horizontal">
+                            <div class="diagram-box" style="max-width: 200px;">Fichiers MD</div>
+                            <div style="font-size: 24px; color: var(--color-blue);">→</div>
+                            <div class="diagram-box" style="max-width: 200px;">Context Loader</div>
+                            <div style="font-size: 24px; color: var(--color-blue);">→</div>
+                            <div class="diagram-box" style="max-width: 200px;">LLM</div>
+                            <div style="font-size: 24px; color: var(--color-blue);">→</div>
+                            <div class="diagram-box" style="max-width: 200px;">Réponse</div>
+                        </div>
+                        <div style="margin-top: 24px; display: flex; justify-content: center; gap: 40px;">
+                            <div class="diagram-arrow">↑</div>
+                            <div class="diagram-arrow">↑</div>
+                        </div>
+                        <div class="diagram-horizontal">
+                            <div class="diagram-box" style="max-width: 200px;">MCP Servers</div>
+                            <div class="diagram-box" style="max-width: 200px;">Historique</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="slide-navigation">
+                    <a href="slide2.html" class="nav-button secondary">← Modèles LLM</a>
+                    <a href="slide4.html" class="nav-button primary">Tokens & Fenêtre →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Présentation Cursor et l'IA pour le Codage</p>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+</body>
+</html>

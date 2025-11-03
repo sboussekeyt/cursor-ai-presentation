@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Importance du Choix du Modèle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/slides.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 40%"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">Cursor & IA</div>
+            <div class="slide-counter">Slide 2 / 5</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="slide1.html">Cursor</a></li>
+                <li><a href="slide2.html" class="active">Modèles</a></li>
+                <li><a href="slide3.html">Context 1</a></li>
+                <li><a href="slide4.html">Context 2</a></li>
+                <li><a href="slide5.html">Context 3</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="slide-wrapper">
+            <div class="slide-container">
+                <!-- Header -->
+                <div class="slide-header">
+                    <div class="gradient-line"></div>
+                    <h1 class="gradient-text">Choisir le Bon Modèle</h1>
+                    <p class="subtitle">Performance vs Coût : Trouver l'Équilibre</p>
+                </div>
+
+                <!-- Why Model Matters -->
+                <div class="card">
+                    <h2>🎯 Pourquoi le Modèle Compte ?</h2>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <span class="feature-icon">💎</span>
+                            <div>
+                                <strong>Qualité du Code</strong>
+                                <p>Impact direct sur la pertinence et la justesse des suggestions</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💰</span>
+                            <div>
+                                <strong>Coût par Requête</strong>
+                                <p>Les tokens s'accumulent rapidement en usage intensif</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">⚡</span>
+                            <div>
+                                <strong>Vitesse</strong>
+                                <p>Temps de génération et expérience développeur</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎓</span>
+                            <div>
+                                <strong>Spécialisation</strong>
+                                <p>Certains modèles excellent pour le code, d'autres pour le chat</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Comparison -->
+                <h2 style="margin: 40px 0 24px 0;">🤖 Comparaison des Modèles</h2>
+                <div class="models-grid">
+                    <!-- Claude Sonnet -->
+                    <div class="model-card">
+                        <h3>Claude Sonnet 3.5/4</h3>
+                        <ul class="model-features">
+                            <li>Excellent pour code complexe</li>
+                            <li>Raisonnement approfondi</li>
+                            <li class="model-warning">Coût élevé ($3-15/1M tokens)</li>
+                            <li class="model-stat">📊 200k tokens contexte</li>
+                        </ul>
+                    </div>
+
+                    <!-- GPT-4 -->
+                    <div class="model-card">
+                        <h3>GPT-4 Turbo / GPT-4o</h3>
+                        <ul class="model-features">
+                            <li>Polyvalent, rapide</li>
+                            <li>Large adoption</li>
+                            <li class="model-warning">Coût moyen ($5-10/1M)</li>
+                            <li class="model-stat">📊 128k tokens contexte</li>
+                        </ul>
+                    </div>
+
+                    <!-- DeepSeek -->
+                    <div class="model-card">
+                        <h3>DeepSeek Coder V3</h3>
+                        <ul class="model-features">
+                            <li>Spécialisé code</li>
+                            <li>Open source</li>
+                            <li>Très économique (<$1/1M)</li>
+                            <li class="model-stat">📊 64k tokens contexte</li>
+                        </ul>
+                    </div>
+
+                    <!-- Gemini -->
+                    <div class="model-card">
+                        <h3>Gemini 2.0 Flash</h3>
+                        <ul class="model-features">
+                            <li>Ultra-rapide</li>
+                            <li>Multimodal</li>
+                            <li>Gratuit (quotas généreux)</li>
+                            <li class="model-stat">📊 1M tokens contexte</li>
+                        </ul>
+                    </div>
+
+                    <!-- GLM-4 -->
+                    <div class="model-card">
+                        <h3>GLM-4 (Zhipu AI)</h3>
+                        <ul class="model-features">
+                            <li>Optimisé Chinois</li>
+                            <li>Bon rapport qualité/prix</li>
+                            <li class="model-stat">📊 128k tokens contexte</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Decision Flowchart -->
+                <div class="card">
+                    <h2>🧭 Guide de Sélection</h2>
+                    <div class="flowchart">
+                        <div class="flowchart-node">Besoin de raisonnement complexe ?</div>
+                        <div class="flowchart-arrow">↓</div>
+                        <div class="flowchart-branch">
+                            <div>
+                                <div class="flowchart-node" style="background: var(--color-light-purple);">
+                                    ✅ Oui<br>
+                                    <strong>→ Claude Sonnet 4</strong>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flowchart-node" style="background: var(--color-light-blue);">
+                                    ❌ Non<br>
+                                    Budget serré ?
+                                </div>
+                                <div class="flowchart-arrow">↓</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div class="flowchart-node" style="background: #D1FAE5; font-size: 13px;">
+                                        ✅ Oui<br>
+                                        <strong>DeepSeek</strong><br>
+                                        <strong>Gemini Flash</strong>
+                                    </div>
+                                    <div class="flowchart-node" style="background: #FEF3C7; font-size: 13px;">
+                                        ❌ Non<br>
+                                        <strong>GPT-4o</strong><br>
+                                        (polyvalence)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="slide-navigation">
+                    <a href="slide1.html" class="nav-button secondary">← Cursor & Outils</a>
+                    <a href="slide3.html" class="nav-button primary">Context Engineering →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Présentation Cursor et l'IA pour le Codage</p>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+</body>
+</html>
